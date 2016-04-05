@@ -1,0 +1,15 @@
+test_file = open('test.csv', 'rU')
+test_file_ob = csv.reader(test_file)
+header = next(test_file_ob)
+
+new_file_1 = open('genderBasedModel_1.csv', 'wt', newline='\n')
+new_file_ob_1 = csv.writer(new_file_1)
+
+new_file_ob_1.writerow(["passengerID", "Survived"])
+for row in test_file_ob:
+    if row[3] == 'female':
+        new_file_ob_1.writerow([row[0], '1'])
+    else:
+        new_file_ob_1.writerow([row[0], '0'])
+test_file.close()
+new_file_1.close()
