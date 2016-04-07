@@ -1,19 +1,37 @@
 
-CREATE EXTERNAL TABLE movie
+CREATE EXTERNAL TABLE RhiannaMovies
 (movieID string, movieName string, movieGenres string)
-LOCATION 'user/hive/ml-latest/movies/'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION '/user/hive/ml-latest/movies/'
 tblproperties("skip.header.line.count"="1");
 
-CREATE EXTERNAL TABLE tag
+CREATE EXTERNAL TABLE RhiannaTags
 (userID string, movieID string, tagName string, tagTimestamp timestamp, userGender string)
-LOCATION 'user/hive/ml-latest/tags/'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION '/user/hive/ml-latest/tags/'
 tblproperties("skip.header.line.count"="1");
 
-CREATE EXTERNAL TABLE rating
-(userID string, movieID string, ratingStar int, ratingTimestamp timestamp)
-LOCATION 'user/hive/ml-latest/ratings/'
+CREATE EXTERNAL TABLE RhiannaRatings
+(userID string, movieID string, rating int, ratingTimestamp timestamp)
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+LOCATION '/user/hive/ml-latest/ratings/'
 tblproperties("skip.header.line.count"="1");
 
+-- Print out the average rating per year
 
+SELECT movieYear, AVG (rating) AS RatingAverage FROM (
+
+-- Use regular expression to extract the year of each movie (YYYY) 
+
+	SELECT regexp_extract (movieName, '\\((\\d\\d\\d\\d)\\)', 1) AS movieYear, rating AS rating from RhiannaMovies
+	JOIN RhiannaRatings
+	ON RhiannaMovies.movieID=RhiannaRatings.movieID
+	) x
+
+GROUP BY movieYear
+
+--show highest rated years at the top
+
+ORDER BY ar DESC;
 
 
